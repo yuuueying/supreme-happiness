@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>谢小破站</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>谢小破站</h1>
+        </header>
+
+        <!-- 发帖表单 -->
+        <div class="post-form">
+            <form action="{{ url_for('create_post') }}" method="post">
+                <!-- 添加作者名称输入 -->
+                <div class="author-input">
+                    <input type="text"
+                           name="author_name"
+                           placeholder="输入你的名字"
+                           class="name-input"
+                           required>
+                </div>
+
+                <!-- 添加头像选择 -->
+                <div class="avatar-selector">
+                    <p class="section-title">选择你的头像：</p>
+                    <div class="avatar-options">
+                        {% for avatar in avatars %}
+                        <label class="avatar-option">
+                            <input type="radio"
+                                   name="avatar"
+                                   value="{{ loop.index0 }}"
+                                   {% if loop.first %}checked{% endif %}>
+                            <span class="avatar-display">{{ avatar.emoji }}</span>
+                            <span class="avatar-name">{{ avatar.name }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <textarea name="content" placeholder="分享你的心情..." required></textarea>
+                <div class="mood-selector">
+                    {% for mood_key, mood in moods.items() %}
+                    <label class="mood-option">
+                        <input type="radio" name="mood" value="{{ mood_key }}" required>
+                        <span class="mood-emoji" style="background-color: {{ mood.color }}">
+                            {{ mood.emoji }}
+                        </span>
+                        {{ mood.name }}
+                    </label>
+                    {% endfor %}
+                </div>
+                <button type="submit">发布</button>
+            </form>
+        </div>
+
+        <!-- 帖子列表 -->
+        <div class="posts">
+            {% for post in posts %}
+            <div class="post">
+                <div class="post-header">
+                    <div class="post-avatar">
+                        {{ avatars[post.avatar].emoji }}
+                    </div>
+                    <span class="author">{{ post.author_name }}</span>
+                    <span class="mood" style="background-color: {{ moods[post.mood].color }}">
+                        {{ moods[post.mood].emoji }} {{ moods[post.mood].name }}
+                    </span>
+                </div>
+                <div class="post-content">{{ post.content }}</div>
+                <div class="post-footer">
+                    <span class="time">{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                    <button class="like-btn" data-post-id="{{ post.id }}">
+                        ❤️ <span class="like-count">{{ post.likes }}</span>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
